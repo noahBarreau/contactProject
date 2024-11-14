@@ -1,10 +1,8 @@
 <?php
-include 'db.php';
+require_once 'db.php';
+require_once 'functions.php';
 
-// Récupérer tous les contacts
-$bsdv_conn = bsdv_connectDB();
-$bsdv_stmt = $bsdv_conn->query("SELECT * FROM contacts ORDER BY nom");
-$bsdv_contacts = $bsdv_stmt->fetchAll(PDO::FETCH_ASSOC);
+$bsdv_contacts = getContacts();
 ?>
 
 <!DOCTYPE html>
@@ -13,41 +11,39 @@ $bsdv_contacts = $bsdv_stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Contacts</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Gestion des Contacts</h1>
-            <a href="add_contact.php" class="btn-primary">Ajouter un Contact</a>
-        </div>
-    </header>
-
-    <main class="container">
-        <h2>Liste des Contacts</h2>
-        <table class="contact-table">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Téléphone</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($bsdv_contacts as $contact): ?>
+    <div class="container">
+        <h1>Gestion des Contacts</h1>
+        <?php if (empty($bsdv_contacts)): ?>
+            <p>Aucun contact trouvé.</p>
+        <?php else: ?>
+            <table>
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($contact['nom']); ?></td>
-                        <td><?php echo htmlspecialchars($contact['email']); ?></td>
-                        <td><?php echo htmlspecialchars($contact['telephone']); ?></td>
-                        <td>
-                            <a href="edit_contact.php?id=<?php echo $contact['id']; ?>" class="btn-edit">Modifier</a>
-                            <a href="delete_contact.php?id=<?php echo $contact['id']; ?>" class="btn-delete">Supprimer</a>
-                        </td>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </main>
+                </thead>
+                <tbody>
+                    <?php foreach ($bsdv_contacts as $bsdv_contact): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($bsdv_contact['nom']); ?></td>
+                            <td><?php echo htmlspecialchars($bsdv_contact['email']); ?></td>
+                            <td><?php echo htmlspecialchars($bsdv_contact['telephone']); ?></td>
+                            <td>
+                                <a href="edit_contact.php?id=<?php echo $bsdv_contact['id']; ?>">Modifier</a> | 
+                                <a href="delete_contact.php?id=<?php echo $bsdv_contact['id']; ?>">Supprimer</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+        <a href="add_contact.php">Ajouter un contact</a>
+    </div>
 </body>
 </html>

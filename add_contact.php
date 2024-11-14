@@ -1,35 +1,18 @@
 <?php
-include 'db.php';
-
-$bsdv_errors = [];
+require_once 'db.php';
+require_once 'functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $bsdv_nom = trim($_POST['bsdv_nom']);
-    $bsdv_email = trim($_POST['bsdv_email']);
-    $bsdv_telephone = trim($_POST['bsdv_telephone']);
+    $bsdv_nom = htmlspecialchars($_POST['nom']);
+    $bsdv_email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+    $bsdv_telephone = htmlspecialchars($_POST['telephone']);
 
-    // Validation des champs
-    if (empty($bsdv_nom)) {
-        $bsdv_errors[] = "Le nom est requis.";
-    }
-    if (empty($bsdv_email)) {
-        $bsdv_errors[] = "L'email est requis.";
-    } elseif (!filter_var($bsdv_email, FILTER_VALIDATE_EMAIL)) {
-        $bsdv_errors[] = "L'email n'est pas valide.";
-    }
-    if (empty($bsdv_telephone)) {
-        $bsdv_errors[] = "Le téléphone est requis.";
-    } elseif (!preg_match('/^[0-9]{10,15}$/', $bsdv_telephone)) {
-        $bsdv_errors[] = "Le numéro de téléphone doit contenir entre 10 et 15 chiffres.";
-    }
-
-    // Si pas d'erreurs, ajouter le contact
-    if (empty($bsdv_errors)) {
-        $bsdv_conn = bsdv_connectDB();
-        $bsdv_stmt = $bsdv_conn->prepare("INSERT INTO contacts (nom, email, telephone) VALUES (?, ?, ?)");
-        $bsdv_stmt->execute([$bsdv_nom, $bsdv_email, $bsdv_telephone]);
-        header("Location: index.php");
-        exit();
+    if (filter_var($bsdv_email, FILTER_VALIDATE_EMAIL)) {
+        addContact($bsdv_nom, $bsdv_email, $bsdv_telephone);
+        header('Location: index.php');
+        exit;
+    } else {
+        $bsdv_error = "L'email n'est pas valide.";
     }
 }
 ?>
@@ -39,34 +22,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un Contact</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Ajouter un contact</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Ajouter un Contact</h1>
-            <a href="index.php" class="btn-secondary">Retour</a>
-        </div>
-    </header>
-
-    <main class="container">
-        <?php if (!empty($bsdv_errors)): ?>
-            <div class="error">
-                <ul>
-                    <?php foreach ($bsdv_errors as $error): ?>
-                        <li><?php echo $error; ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
+    <div class="container">
+        <h1>Ajouter un contact</h1>
+        <?php if (isset($bsdv_error)): ?>
+            <p style="color: red;"><?php echo $bsdv_error; ?></p>
         <?php endif; ?>
-        
-        <form action="add_contact.php" method="POST" class="form-contact">
-            <input type="text" name="bsdv_nom" placeholder="Nom" required>
-            <input type="email" name="bsdv_email" placeholder="Email" required>
-            <input type="text" name="bsdv_telephone" placeholder="Téléphone" required>
-            <button type="submit" class="btn-primary">Ajouter</button>
+        <form method="POST">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone" required>
+            <button type="submit">Ajouter</button>
         </form>
-    </main>
+    </div>
 </body>
 </html>

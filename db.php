@@ -1,18 +1,17 @@
 <?php
-$bsdv_host = 'localhost';
+$bsdv_dbhost = 'localhost';
 $bsdv_dbname = 'contacts_db';
-$bsdv_username = 'root';
-$bsdv_password = '';
+$bsdv_dbuser = 'root';
+$bsdv_dbpass = '';
 
-function bsdv_connectDB() {
-    global $bsdv_host, $bsdv_dbname, $bsdv_username, $bsdv_password;
+function connectDB() {
+    global $bsdv_dbhost, $bsdv_dbname, $bsdv_dbuser, $bsdv_dbpass;
     try {
-        $bsdv_conn = new PDO("mysql:host=$bsdv_host;dbname=$bsdv_dbname;charset=utf8", $bsdv_username, $bsdv_password);
+        $bsdv_conn = new PDO("mysql:host=$bsdv_dbhost;dbname=$bsdv_dbname", $bsdv_dbuser, $bsdv_dbpass);
         $bsdv_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $bsdv_conn;
     } catch (PDOException $e) {
-        echo "Erreur de connexion : " . $e->getMessage();
-        exit();
+        die("Erreur de connexion : " . $e->getMessage());
     }
 }
 ?>

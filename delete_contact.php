@@ -1,14 +1,10 @@
 <?php
-include 'db.php';
+require_once 'db.php';
+require_once 'functions.php';
 
 if (isset($_GET['id'])) {
-    $bsdv_id = $_GET['id'];
-    $bsdv_conn = bsdv_connectDB();
-
-    $bsdv_stmt = $bsdv_conn->prepare("DELETE FROM contacts WHERE id = ?");
-    $bsdv_stmt->execute([$bsdv_id]);
+    deleteContact($_GET['id']);
 }
 
-header("Location: index.php");
-exit();
-?>
+header('Location: index.php');
+exit;
